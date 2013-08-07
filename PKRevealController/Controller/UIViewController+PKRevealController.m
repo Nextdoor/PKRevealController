@@ -26,11 +26,11 @@ static char revealControllerKey;
 - (PKRevealController *)revealController
 {
     PKRevealController* aRevealController = (PKRevealController *)objc_getAssociatedObject(self, &revealControllerKey);
-    
+
     if (aRevealController == nil) {
         aRevealController = [self.parentViewController revealController];
     }
-    
+
     return aRevealController;
 }
 
