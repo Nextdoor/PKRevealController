@@ -961,7 +961,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
         
         [weakSelf setFrontViewFrame:[weakSelf frontViewFrameForVisibleLeftView]
                            animated:animated
-                         completion:^(BOOL finished)
+                         completion:^(BOOL innerFinished)
          {
              if (weakSelf.disablesFrontViewInteraction)
              {
@@ -970,7 +970,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
              weakSelf.state = PKRevealControllerFocusesLeftViewController;
              [weakSelf removeRightViewControllerFromHierarchy];
              [weakSelf updateResetTapGestureRecognizer];
-             safelyExecuteCompletionBlockOnMainThread(completion, finished);
+             safelyExecuteCompletionBlockOnMainThread(completion, innerFinished);
          }];
     };
     
@@ -1001,7 +1001,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
         
         [weakSelf setFrontViewFrame:[weakSelf frontViewFrameForVisibleRightView]
                            animated:animated
-                         completion:^(BOOL finished)
+                         completion:^(BOOL innerFinished)
         {
             if (weakSelf.disablesFrontViewInteraction)
             {
@@ -1009,7 +1009,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
             }
             weakSelf.state = PKRevealControllerFocusesRightViewController;
             [weakSelf updateResetTapGestureRecognizer];
-            safelyExecuteCompletionBlockOnMainThread(completion, finished);
+            safelyExecuteCompletionBlockOnMainThread(completion, innerFinished);
         }];
     };
     
