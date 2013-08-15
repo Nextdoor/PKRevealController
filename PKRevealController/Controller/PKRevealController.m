@@ -971,6 +971,10 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
              [weakSelf removeRightViewControllerFromHierarchy];
              [weakSelf updateResetTapGestureRecognizer];
              safelyExecuteCompletionBlockOnMainThread(completion, innerFinished);
+
+             // Notify view controllers of transition:
+             [weakSelf notifyViewControllerDidBecomeActive:weakSelf.leftViewController];
+             [weakSelf notifyViewControllerDidBecomeInactive:weakSelf.frontViewController];
          }];
     };
     
@@ -1010,6 +1014,10 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
             weakSelf.state = PKRevealControllerFocusesRightViewController;
             [weakSelf updateResetTapGestureRecognizer];
             safelyExecuteCompletionBlockOnMainThread(completion, innerFinished);
+
+            // Notify view controllers of transition:
+            [weakSelf notifyViewControllerDidBecomeActive:weakSelf.rightViewController];
+            [weakSelf notifyViewControllerDidBecomeInactive:weakSelf.frontViewController];
         }];
     };
     
@@ -1031,6 +1039,16 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 - (void)showFrontViewControllerAnimated:(BOOL)animated
                              completion:(PKDefaultCompletionHandler)completion
 {
+    UIViewController *hidingViewController;
+    // Figure out which view is about to go off-screen:
+    if (self.state == PKRevealControllerFocusesLeftViewController ||
+        self.state == PKRevealControllerFocusesLeftViewControllerInPresentationMode) {
+        hidingViewController = self.leftViewController;
+    } else if (self.state == PKRevealControllerFocusesRightViewController ||
+               self.state == PKRevealControllerFocusesRightViewControllerInPresentationMode) {
+        hidingViewController = self.rightViewController;
+    }
+
     __weak PKRevealController *weakSelf = self;
     
     [self setFrontViewFrame:[self frontViewFrameForCenter]
@@ -1046,6 +1064,10 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
          [weakSelf removeLeftViewControllerFromHierarchy];
          [weakSelf updateResetTapGestureRecognizer];
          safelyExecuteCompletionBlockOnMainThread(completion, finished);
+
+         // Notify view controllers of transition:
+         [weakSelf notifyViewControllerDidBecomeActive:weakSelf.frontViewController];
+         [weakSelf notifyViewControllerDidBecomeInactive:hidingViewController];
      }];
 }
 
@@ -1167,6 +1189,37 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
         safelyExecuteCompletionBlockOnMainThread(completion, finished);
     }];
 }
+
+
+#pragma mark - Helpers (PKRevealControllerPresentation)
+
+// If the view controller is a UINavigationController,
+// find its top-most view controller.
+- (id<PKRevealControllerPresentation>)viewControllerUnderNavStack:(UIViewController *)viewController {
+    id<PKRevealControllerPresentation>finalViewController = (id<PKRevealControllerPresentation>)viewController;
+    if ([[viewController class] isSubclassOfClass:[UINavigationController class]]) {
+        UINavigationController *navController = (UINavigationController *)viewController;
+        finalViewController = (id<PKRevealControllerPresentation>)navController.topViewController;
+    }
+    return finalViewController;
+}
+
+
+- (void)notifyViewControllerDidBecomeActive:(UIViewController *)viewController {
+    id<PKRevealControllerPresentation>finalViewController = [self viewControllerUnderNavStack:viewController];
+    if ([finalViewController respondsToSelector:@selector(pkrevealControllerDidBecomeActive)]) {
+        [finalViewController pkrevealControllerDidBecomeActive];
+    }
+}
+
+
+- (void)notifyViewControllerDidBecomeInactive:(UIViewController *)viewController {
+    id<PKRevealControllerPresentation>finalViewController = [self viewControllerUnderNavStack:viewController];
+    if ([finalViewController respondsToSelector:@selector(pkrevealControllerDidBecomeInactive)]) {
+        [finalViewController pkrevealControllerDidBecomeInactive];
+    }
+}
+
 
 #pragma mark - Helpers (Gestures)
 

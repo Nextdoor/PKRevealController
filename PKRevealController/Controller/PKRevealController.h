@@ -107,6 +107,22 @@ extern NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey;
 typedef void(^PKDefaultCompletionHandler)(BOOL finished);
 typedef void(^PKDefaultErrorHandler)(NSError *error);
 
+
+// PKRevealControllerPresentation provides a presented view controller
+// with lifecycle events around being revealed and hidden.
+// Any view controller that conforms to PKRevealControllerPresentation
+// will be notified of these events as they occur.
+@protocol PKRevealControllerPresentation <NSObject>
+
+@optional
+// Presentation:
+- (void)pkrevealControllerDidBecomeActive;
+// Dismissal:
+- (void)pkrevealControllerDidBecomeInactive;
+
+@end
+
+
 @interface PKRevealController : UIViewController <UIGestureRecognizerDelegate>
 
 #pragma mark - Properties
