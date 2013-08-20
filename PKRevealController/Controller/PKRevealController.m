@@ -365,6 +365,38 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
     }
 }
 
+- (CGFloat)minimumWidthForViewController:(UIViewController *)controller
+{
+    if (controller == self.leftViewController)
+    {
+        return self.leftViewWidthRange.location;
+    }
+    else if (controller == self.rightViewController)
+    {
+        return self.rightViewWidthRange.location;
+    }
+    else
+    {
+        return 0.0f;
+    }
+}
+
+- (CGFloat)maximumWidthForViewController:(UIViewController *)controller
+{
+    if (controller == self.leftViewController)
+    {
+        return self.leftViewWidthRange.length;
+    }
+    else if (controller == self.rightViewController)
+    {
+        return self.rightViewWidthRange.length;
+    }
+    else
+    {
+        return 0.0f;
+    }
+}
+
 - (UIViewController *)focusedController
 {
     UIViewController *returnViewController = nil;
